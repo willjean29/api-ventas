@@ -8,7 +8,7 @@ class RedisCache {
   constructor() {
     this.client = redis.createClient({
       socket: {
-        host: 'localhost',
+        host: 'redis',
         port: 6379,
       },
       password: '',

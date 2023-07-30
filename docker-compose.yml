@@ -1,0 +1,59 @@
+version: '3'
+
+services:
+  app:
+    depends_on:
+      - db
+    build:
+      context: .
+      target: dev
+      dockerfile: Dockerfile
+    volumes:
+      - .:/app
+      - /app/node_modules
+    container_name: api-ventas-app
+    ports:
+      - "4000:4000"
+    environment:
+      APP_SECRET: ${APP_SECRET}
+      APP_API_URL: ${APP_API_URL}
+      APP_WEB_URL: ${APP_WEB_URL}
+      REDIS_HOST: ${REDIS_HOST}
+      REDIS_PORT: ${REDIS_PORT}
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+      MAIL_DRIVER: ${MAIL_DRIVER}
+      STORAGE_DRIVER: ${STORAGE_DRIVER}
+      AWS_BUCKET_NAME: ${AWS_BUCKET_NAME}
+      AWS_REGION: ${AWS_REGION}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      STAGE: ${STAGE}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_USERNAME: ${DB_USERNAME}
+
+  redis:
+    image: redis
+    container_name: redis
+    restart: always
+    ports:
+      - "${REDIS_PORT}:${REDIS_PORT}"
+  redis-client:
+    depends_on:
+      - redis
+    image: redislabs/redisinsight
+    ports:
+      - "8001:8001"
+  db:
+    image: postgres:14.3
+    restart: always
+    ports:
+      - "${DB_PORT}:${DB_PORT}"
+    container_name: ${DB_NAME}
+    environment:
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    volumes:
+      - ./postgres-db:/var/lib/postgresql/data
